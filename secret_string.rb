@@ -10,11 +10,12 @@ triplets_1 = [
 ]
 
 class SecretStringFinder
-  attr_accessor :letters, :pairs
+  attr_accessor :letters, :pairs, :secret_word
 
   def initialize(triplets)
     @pairs = find_pairs_from_triplets(triplets)
     @letters = @pairs.flatten.uniq
+    @secret_word = ''
   end
 
   def find_pairs_from_triplets(triplets)
@@ -27,9 +28,7 @@ class SecretStringFinder
     pairs
   end
 
-  # First letter would be the only one that is never second in a pair
   def find_next_letter
-    # loop over letters, and in each loop, run a smaller one
     next_letter = nil
 
     @letters.each do |letter|
@@ -42,10 +41,15 @@ class SecretStringFinder
       next_letter = letter if letter_is_valid
     end
 
-    next_letter
+    if next_letter
+      @letters.delete(next_letter)
+      @pairs.each do |pair|
+        pair.delete(next_letter) if pair.include?(next_letter)
+      end
+      @secret_word += next_letter
+      next_letter
+    end
   end
-  # next letter will also never occur second as soon as the first letter is filtered
-  # Build your string by adding the first letter, then each new one in sequence
 end
 
-f = SecretStringFinder.new(triplets_1)
+SecretStringFinder.new(triplets_1)
