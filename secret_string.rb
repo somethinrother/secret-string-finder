@@ -14,7 +14,7 @@ class SecretStringFinder
 
   def initialize(triplets)
     @pairs = find_pairs_from_triplets(triplets)
-    @letters = @pairs.flatten.uniq
+    @letters = find_letters_from_pairs
     @secret_word = ''
   end
 
@@ -37,21 +37,31 @@ class SecretStringFinder
 
     @letters.each do |letter|
       letter_is_valid = true
-
-      @pairs.each do |pair|
-        letter_is_valid = false if letter == pair[1]
-      end
-
+      @pairs.each { |pair| letter_is_valid = false if letter == pair[1] }
       next_letter = letter if letter_is_valid
     end
 
-    if next_letter
-      @letters.delete(next_letter)
-      @pairs.each do |pair|
-        pair.delete(next_letter) if pair.include?(next_letter)
-      end
-      @secret_word += next_letter
-      next_letter
+    process_correct_letter(next_letter) if next_letter
+  end
+
+  def process_correct_letter(correct_letter)
+    # Remove instances of found letter in pairs
+    @pairs = @pairs.map do |pair|
+      pair.reject { |letter| letter == correct_letter }
     end
+    @letters = find_letters_from_pairs
+    # Add letter to secret word
+    @secret_word += correct_letter
+    correct_letter
+  end
+
+  def find_letters_from_pairs
+    @pairs.flatten.uniq
   end
 end
+
+# Ensure function works
+finder = SecretStringFinder.new(triplets_1)
+secret_string = finder.find_secret_string
+puts "Your secret word is #{secret_string}"
+puts "Correct Match? : #{secret_string == secret_1}"
