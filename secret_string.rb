@@ -18,14 +18,18 @@ class SecretStringFinder
     @secret_word = ''
   end
 
+  def find_secret_string
+    find_next_letter until @letters.empty?
+    @secret_word
+  end
+
+  private
+
   def find_pairs_from_triplets(triplets)
-    pairs = []
-    triplets.each do |triplet|
+    triplets.each_with_object([]) do |triplet, pairs|
       pairs << [triplet[0], triplet[1]]
       pairs << [triplet[1], triplet[2]]
     end
-
-    pairs
   end
 
   def find_next_letter
@@ -51,5 +55,3 @@ class SecretStringFinder
     end
   end
 end
-
-SecretStringFinder.new(triplets_1)
